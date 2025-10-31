@@ -1,4 +1,4 @@
-name: Build and Test Docker Image
+name: Build and Push Docker Image
 
 on:
   push:
@@ -10,23 +10,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1 — Checkout your repository
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2 — Set up Docker Buildx (a modern builder for Docker)
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # Step 3 — Build your Docker image
-      - name: Build Docker image
-        run: docker build -t hello_service:latest .
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Step 4 — Run and test your container in GitHub's virtual machine
-      - name: Test container
-        run: |
-          docker run -d -p 3000:3000 --name hello-test hello_service:latest
-          sleep 3
-          docker ps
-          docker logs hello-test
-          docker stop hello-test
+      - name: Build and Push to Docker Hub
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: kazoulakhalil2/newdockerapp:latest
+
+      - name: Verify Image
+        run: docker pull kazoulakhalil2/newdockerapp:latest
