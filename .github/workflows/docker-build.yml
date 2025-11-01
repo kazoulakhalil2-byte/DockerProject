@@ -22,12 +22,9 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and Push to Docker Hub
+      - name: Build and Push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: kazoulakhalil2/newdockerapp:latest
-
-      - name: Verify Image
-        run: docker pull kazoulakhalil2/newdockerapp:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/hello_service:latest
